@@ -5,7 +5,7 @@ import { ProductProvider } from "@/context/ProductContext";
 import { CartProvider } from "@/context/CartContext";
 import { CatalogProvider } from "@/context/CatalogContext";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
-import { ReactLenis } from "@studio-freight/react-lenis";
+import { ReactLenis } from "lenis/react";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
