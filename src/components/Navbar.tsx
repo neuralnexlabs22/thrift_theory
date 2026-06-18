@@ -10,7 +10,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass px-6 md:px-10 py-5 flex justify-between items-center transition-luxury">
+    <nav className="fixed top-8 w-full z-40 glass px-6 md:px-10 py-5 flex justify-between items-center transition-luxury">
       {/* Brand logo */}
       <Link href="/" className="heading-luxury text-2xl tracking-[0.2em] text-primary hover:brightness-95 transition-all">
         ThriftTheory

@@ -18,7 +18,7 @@ export function AnnouncementBar() {
   const items = [...announcements, ...announcements, ...announcements, ...announcements];
 
   return (
-    <div className="w-full bg-primary text-primary-foreground py-2 overflow-hidden flex items-center">
+    <div className="fixed top-0 left-0 w-full z-50 bg-primary text-primary-foreground py-2 overflow-hidden flex items-center">
       <motion.div
         className="flex whitespace-nowrap gap-8 text-xs font-medium uppercase tracking-widest"
         animate={{

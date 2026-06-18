@@ -4,7 +4,8 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import CartSidebar from "@/components/CartSidebar";
-import Navbar from "@/components/Navbar";
+import { Header } from "@/components/home/Header";
+import { Footer } from "@/components/home/Footer";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -35,8 +36,9 @@ export default function RootLayout({
         <Providers>
           <AnnouncementBar />
           <CartSidebar />
-          <Navbar />
-          {children}
+          <Header />
+          <main className="flex-grow">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

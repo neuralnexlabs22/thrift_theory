@@ -60,109 +60,89 @@ export default function ShopMainPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-32 pb-24">
-
-
-      {/* Hero Header */}
-      <div className="relative min-h-[50vh] flex flex-col items-center justify-center text-center px-4 md:px-8 mb-16">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-primary/5 rounded-full filter blur-[120px]" />
-        </div>
-
-        <div className="relative z-10 max-w-4xl">
+    <div className="pt-32 pb-24 bg-[#F3F7F4] min-h-screen text-[#004225]">
+      {/* Header Banner */}
+      <div className="bg-[#004225] text-[#E8F0EA] border-b border-[#355E3B]/20 py-16 mb-16 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[200px] bg-[#355E3B]/20 rounded-full filter blur-[100px] pointer-events-none" />
+        
+        <div className="container mx-auto px-4 md:px-8 text-center relative z-10 max-w-4xl">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors mb-6 group"
+            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#E8F0EA]/70 hover:text-white transition-colors mb-6 group"
           >
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
             Back to Home
           </Link>
-
-          <motion.p
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-xs md:text-sm tracking-[0.4em] uppercase font-bold text-primary mb-4"
-          >
-            THRIFTTHEORY MENS
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <h1 className="heading-luxury text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 font-serif tracking-tight leading-none">
-              THE COLLECTIONS
-            </h1>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-base md:text-lg uppercase tracking-widest text-muted-foreground font-light max-w-2xl mx-auto"
-          >
-            Curated vintage apparel, earth tones & oversized streetwear blanks.
-          </motion.p>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-[family-name:var(--font-serif)] tracking-tight mb-4 flex items-center justify-center gap-4">
+            CURATED COLLECTIONS
+          </h1>
+          <p className="text-[#E8F0EA]/80 text-xs md:text-sm tracking-[0.25em] uppercase font-bold">
+            THRIFT THEORY &bull; EXCLUSIVE EDITS
+          </p>
         </div>
       </div>
 
-      {/* Category Grid Section */}
-      <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {categories.map((cat, i) => (
-            <motion.div
+      <div className="container mx-auto px-4 md:px-8 max-w-[1400px]">
+        <div className="flex flex-col space-y-16 md:space-y-32">
+          {categories.map((cat, index) => (
+            <motion.div 
               key={cat.slug}
               initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.6, ease: "easeOut" }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className={`flex flex-col lg:flex-row gap-8 lg:gap-20 items-center ${
+                index % 2 !== 0 ? "lg:flex-row-reverse" : ""
+              }`}
             >
-              <Link
-                href={`/shop/${cat.slug}`}
-                className="group block relative bg-card border border-primary/15 hover:border-primary transition-all duration-500 hover:shadow-[0_12px_45px_rgba(138,115,80,0.12)]"
-              >
-                {/* Image background */}
-                <div className="relative h-72 md:h-80 overflow-hidden bg-secondary">
+              {/* Collection Image */}
+              <div className="w-full lg:w-3/5 aspect-[4/3] relative overflow-hidden bg-[#355E3B] group rounded-sm shadow-2xl border border-[#4C6B47]/20">
+                <Link href={`/shop/${cat.slug}`} className="block w-full h-full">
                   <Image
                     src={cat.image}
                     alt={cat.name}
                     fill
-                    className="object-cover opacity-80 group-hover:opacity-90 group-hover:scale-105 transition-all duration-700"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-                  {/* Product count badge */}
-                  <div className="absolute top-5 right-5 bg-background border border-primary/20 text-foreground text-[9px] font-bold tracking-widest uppercase px-3 py-1.5">
-                    {mounted && loaded ? getProductCount(cat.name) : 0} Items
-                  </div>
-                </div>
-
-                {/* Card footer details */}
-                <div className="p-6 bg-card border-t border-primary/10 group-hover:border-primary/30 transition-colors duration-300">
-                  <p className="text-primary text-[9px] tracking-[0.3em] uppercase font-bold mb-2">
-                    {cat.tagline}
-                  </p>
-                  <h2 className="heading-luxury text-2xl uppercase tracking-wider text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
-                    {cat.name}
-                  </h2>
-                  <p className="text-muted-foreground text-xs leading-relaxed mb-6 h-10 line-clamp-2">
-                    {cat.description}
-                  </p>
-
-                  {/* Arrow action */}
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary group-hover:gap-4 transition-all duration-300">
-                      EXPLORE DROP
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                    <div className="w-8 h-8 border border-primary/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-                      <ArrowRight className="w-3.5 h-3.5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#004225]/80 via-[#004225]/20 to-transparent" />
+                  
+                  {/* Badge Overlay */}
+                  <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+                    <div>
+                      <p className="text-[#E8F0EA]/80 text-[10px] tracking-[0.3em] font-bold uppercase mb-2">
+                        {cat.tagline}
+                      </p>
+                      <h3 className="text-3xl md:text-4xl font-[family-name:var(--font-serif)] text-white tracking-wide">
+                        {cat.name}
+                      </h3>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full">
+                      {mounted && loaded ? getProductCount(cat.name) : 0} Items
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
+
+              {/* Collection Details */}
+              <div className="w-full lg:w-2/5 flex flex-col justify-center text-center lg:text-left px-4">
+                <span className="text-[#355E3B] uppercase tracking-[0.25em] text-[11px] font-bold mb-4">
+                  COLLECTION #0{index + 1}
+                </span>
+                <h2 className="font-[family-name:var(--font-serif)] text-4xl md:text-5xl text-[#004225] mb-6 tracking-tight">
+                  {cat.name}
+                </h2>
+                <p className="text-[#4C6B47] text-sm md:text-base leading-relaxed mb-10 font-light">
+                  {cat.description} Redefining the standard of premium styling through our curated {cat.name.toLowerCase()} capsule. Hand-picked for quality, style, and timeless appeal.
+                </p>
+                <Link
+                  href={`/shop/${cat.slug}`}
+                  className="inline-flex items-center space-x-3 text-white bg-[#004225] hover:bg-[#355E3B] transition-all px-8 py-4 rounded-sm text-xs font-bold uppercase tracking-widest shadow-lg mx-auto lg:mx-0 w-fit group"
+                >
+                  <span>Explore Edit</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>
