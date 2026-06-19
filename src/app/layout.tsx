@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
-import { AnnouncementBar } from "@/components/AnnouncementBar";
-import CartSidebar from "@/components/CartSidebar";
-import { Header } from "@/components/home/Header";
-import { Footer } from "@/components/home/Footer";
+import { StoreLayoutWrapper } from "@/components/StoreLayoutWrapper";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -34,11 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <Providers>
-          <AnnouncementBar />
-          <CartSidebar />
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          <StoreLayoutWrapper>{children}</StoreLayoutWrapper>
         </Providers>
       </body>
     </html>

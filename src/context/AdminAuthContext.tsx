@@ -13,8 +13,8 @@ const AUTH_KEY = "thrifttheoryindia_admin_auth";
 const AUTH_EXPIRY_HOURS = 24;
 
 // Default admin credentials — change these for production
-const ADMIN_USERNAME = "thrifttheory@admin";
-const ADMIN_PASSWORD = "thrifttheory@admin";
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "thrift@admin";
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;

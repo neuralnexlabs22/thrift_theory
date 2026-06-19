@@ -12,8 +12,8 @@ function getSecret(): string {
 
 export function getAdminCredentials(): { username: string; password: string } {
   return {
-    username: "thrifttheory@admin",
-    password: "thrifttheory@admin",
+    username: "admin",
+    password: "thrift@admin",
   };
 }
 

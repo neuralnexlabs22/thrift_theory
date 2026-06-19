@@ -231,7 +231,7 @@ function AdminDashboardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1" data-lenis-prevent>
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -292,7 +292,7 @@ function AdminDashboardShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8" data-lenis-prevent>
           {children}
         </main>
       </div>

@@ -20,8 +20,8 @@ export function HeroSection() {
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#004225]/40 via-[#004225]/60 to-[#004225] z-10" />
         <img
-          src="https://images.unsplash.com/photo-1654005018306-7066fc118281?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW5zJTIwbHV4dXJ5JTIwZmFzaGlvbiUyMGVkaXRvcmlhbCUyMG1vZGVsfGVufDF8fHx8MTc4MTc5NzEzM3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-          alt="Men's luxury fashion editorial"
+          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1080&auto=format&fit=crop"
+          alt="Stack of vintage thrift shirts"
           className="w-full h-[120%] object-cover -top-[10%]"
         />
       </motion.div>
@@ -47,25 +47,25 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <p className="font-[family-name:var(--font-sans)] text-sm tracking-[0.3em] text-[#4C6B47] mb-8 uppercase">
-            Premium Men's Thrift Fashion
+          <p className="font-[family-name:var(--font-sans)] text-sm tracking-[0.3em] text-[#4C6B47] mb-8 uppercase font-bold">
+            Limited Time Offer
           </p>
           
           <h1 className="font-[family-name:var(--font-serif)] text-6xl lg:text-8xl mb-6 leading-[1.1] tracking-tight text-[#E8F0EA]">
-            CURATED FOR<br />MODERN MEN
+            THE 10 SHIRT<br />BUNDLE
           </h1>
           
-          <p className="font-[family-name:var(--font-sans)] text-xl lg:text-2xl text-[#E8F0EA]/80 mb-12 max-w-2xl mx-auto font-light tracking-wide">
-            Luxury vintage. Unmatched style. Mystery bundles curated for the discerning gentleman.
+          <p className="font-[family-name:var(--font-sans)] text-xl lg:text-2xl text-[#E8F0EA]/90 mb-12 max-w-2xl mx-auto font-light tracking-wide">
+            10 hand-picked premium vintage pieces curated for your unique style. Unmatched value, unmatched aesthetic.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/bundles">
               <Button
                 size="lg"
-                className="bg-[#4C6B47] hover:bg-[#355E3B] text-white px-10 py-6 rounded-none font-[family-name:var(--font-sans)] tracking-wider group"
+                className="bg-[#4C6B47] hover:bg-[#355E3B] text-white px-10 py-6 rounded-none font-[family-name:var(--font-sans)] tracking-wider group border border-[#4C6B47]"
               >
-                SHOP BUNDLES
+                GET YOUR BUNDLE NOW
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
