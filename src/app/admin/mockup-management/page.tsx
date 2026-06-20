@@ -33,6 +33,7 @@ export default function MockupManagementPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    if (!supabase) return setLoading(false);
     const [typesRes, colorsRes] = await Promise.all([
       supabase.from("custom_clothing_types").select("*").order("created_at"),
       supabase.from("custom_colors").select("*").order("name")
@@ -61,12 +62,14 @@ export default function MockupManagementPage() {
   };
 
   const handleDeleteType = async (id: string) => {
+    if (!supabase) return;
     await supabase.from("custom_clothing_types").delete().eq("id", id);
     fetchData();
   };
 
   const handleAddColor = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) return;
     if (!colorName || !colorHex) return;
     await supabase.from("custom_colors").insert({ name: colorName, hex_code: colorHex, is_active: true });
     setColorName("");
@@ -75,6 +78,7 @@ export default function MockupManagementPage() {
   };
 
   const handleDeleteColor = async (id: string) => {
+    if (!supabase) return;
     await supabase.from("custom_colors").delete().eq("id", id);
     fetchData();
   };
@@ -111,6 +115,7 @@ export default function MockupManagementPage() {
                 <p className="text-[10px] text-zinc-500">* Upload a blank, light-colored PNG for best color blending results.</p>
                 <button 
                   onClick={async () => {
+                    if (!supabase) return alert("Supabase not configured");
                     if (!typeName) return alert("Enter type name");
                     if (!typeImageUrl) return alert("Enter image URL or upload");
                     await supabase.from("custom_clothing_types").insert({ name: typeName, base_image_url: typeImageUrl, is_active: true });

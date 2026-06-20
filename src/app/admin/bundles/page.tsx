@@ -26,6 +26,7 @@ export default function AdminBundlesPage() {
 
   const fetchBundles = async () => {
     setLoading(true);
+    if (!supabase) return setLoading(false);
     const { data, error } = await supabase.from("bundles").select("*").order("created_at", { ascending: false });
     if (data) setBundles(data);
     setLoading(false);
@@ -34,6 +35,7 @@ export default function AdminBundlesPage() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!supabase) return setError("Supabase is not configured.");
     if (!name.trim() || !price || !itemsCount) {
       setError("Name, price, and items count are required.");
       return;
@@ -61,11 +63,13 @@ export default function AdminBundlesPage() {
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
+    if (!supabase) return;
     await supabase.from("bundles").update({ is_active: !isActive }).eq("id", id);
     fetchBundles();
   };
 
   const handleDelete = async (id: string) => {
+    if (!supabase) return;
     await supabase.from("bundles").delete().eq("id", id);
     setDeleteConfirm(null);
     fetchBundles();

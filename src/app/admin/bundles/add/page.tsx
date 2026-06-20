@@ -155,6 +155,8 @@ export default function AddBundlePage() {
     }
 
     setSaving(true);
+    if (!supabase) return;
+    
     const validImages = imageUrls.filter((url) => url.trim() !== "");
     const mainImage = validImages.length > 0 ? validImages[0] : "/images/mystery_bundle_box.png";
 

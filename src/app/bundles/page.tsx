@@ -15,6 +15,7 @@ export default function MysteryBundlesPage() {
 
   useEffect(() => {
     const fetchBundles = async () => {
+      if (!supabase) return setLoading(false);
       const { data } = await supabase.from("bundles").select("*").eq("is_active", true);
       if (data) setBundles(data);
       setLoading(false);

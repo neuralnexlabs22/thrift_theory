@@ -28,6 +28,7 @@ export default function CustomOrdersPage() {
 
   const fetchOrders = async () => {
     setLoading(true);
+    if (!supabase) return setLoading(false);
     const { data } = await supabase
       .from("custom_orders")
       .select(`
@@ -42,6 +43,7 @@ export default function CustomOrdersPage() {
   };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
+    if (!supabase) return;
     await supabase.from("custom_orders").update({ status: newStatus }).eq("id", id);
     fetchOrders();
   };

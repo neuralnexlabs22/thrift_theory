@@ -59,6 +59,7 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
   }, [id]);
 
   const fetchData = async () => {
+    if (!supabase) return;
     setLoading(true);
     // Fetch bundle
     const { data: bData } = await supabase.from("bundles").select("*").eq("id", id).single();
@@ -105,11 +106,13 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
   };
 
   const handleAddProduct = async (productId: string) => {
+    if (!supabase) return;
     await supabase.from("bundle_products").insert({ bundle_id: id, product_id: productId });
     setBundleProducts([...bundleProducts, productId]);
   };
 
   const handleRemoveProduct = async (productId: string) => {
+    if (!supabase) return;
     await supabase.from("bundle_products").delete().match({ bundle_id: id, product_id: productId });
     setBundleProducts(bundleProducts.filter((pid) => pid !== productId));
   };
@@ -213,8 +216,9 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
 
   const handleSaveDetails = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage({ text: "", type: "" });
+    setMessage({ text: "", type: "" as "success" | "error" });
     setSaving(true);
+    if (!supabase) return;
 
     const validImages = imageUrls.filter((url) => url.trim() !== "");
     const mainImage = validImages.length > 0 ? validImages[0] : "/images/mystery_bundle_box.png";

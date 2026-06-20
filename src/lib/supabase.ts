@@ -1,10 +1,11 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-url.supabase.co";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-key";
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+export const isSupabaseConfigured = Boolean(
+  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(supabaseUrl!, supabaseAnonKey!)
-  : null;
+// Always export a valid client to satisfy TypeScript and prevent nullability errors during build
+export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);

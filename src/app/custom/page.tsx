@@ -50,6 +50,7 @@ export default function InteractiveCustomizerPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    if (!supabase) return setLoading(false);
     const [typesRes, colorsRes] = await Promise.all([
       supabase.from("custom_clothing_types").select("*").eq("is_active", true).order("created_at"),
       supabase.from("custom_colors").select("*").eq("is_active", true).order("name"),
@@ -116,6 +117,11 @@ export default function InteractiveCustomizerPage() {
     }
 
     setSubmitting(true);
+    if (!supabase) {
+      alert("Database configuration missing.");
+      setSubmitting(false);
+      return;
+    }
 
     try {
       // Use the backend API to bypass Storage RLS
