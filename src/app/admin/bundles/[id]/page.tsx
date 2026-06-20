@@ -497,5 +497,5 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
         </form>
       )}
     </motion.div>
-  );
+  );  
 }
