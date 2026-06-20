@@ -5,6 +5,8 @@ import { slugToProductCategory } from "@/lib/catalogHelpers";
 import { loadCatalog } from "@/lib/catalogStore";
 
 let memoryCache: Product[] | null = null;
+let cacheTimestamp: number | null = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 function buildDefaultProducts(): Product[] {
   return defaultProducts.map((p) => ({
@@ -120,7 +122,9 @@ async function migrateLocalProductsToSupabase() {
 }
 
 export async function loadProducts(force = false): Promise<Product[]> {
-  if (memoryCache && !force) return memoryCache;
+  const now = Date.now();
+  const cacheValid = memoryCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_TTL_MS;
+  if (cacheValid && !force) return memoryCache!;
 
   if (!isSupabaseConfigured || !supabase) {
     if (typeof window !== 'undefined') {
@@ -145,6 +149,7 @@ export async function loadProducts(force = false): Promise<Product[]> {
     const remote = await fetchRemoteProducts();
     if (remote !== null && remote.length > 0) {
       memoryCache = remote;
+      cacheTimestamp = Date.now();
       return remote;
     }
   } catch (error) {
@@ -163,6 +168,7 @@ export function getProductsSync(): Product[] {
 
 export function invalidateProductsCache() {
   memoryCache = null;
+  cacheTimestamp = null;
 }
 
 export async function refreshProducts(): Promise<Product[]> {
