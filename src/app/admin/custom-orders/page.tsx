@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Eye, Clock, CheckCircle, Package, Send, ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { Package, Send, ExternalLink, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
 export default function CustomOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const STATUS_COLORS: Record<string, string> = {
     'Pending': 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20',
@@ -48,6 +49,15 @@ export default function CustomOrdersPage() {
     fetchOrders();
   };
 
+  const handleDelete = async (id: string) => {
+    if (!supabase) return;
+    setDeleting(id);
+    await supabase.from("custom_orders").delete().eq("id", id);
+    setOrders(prev => prev.filter(o => o.id !== id));
+    setDeleteConfirm(null);
+    setDeleting(null);
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-96"><div className="w-8 h-8 border-2 border-[var(--accent-1)] border-t-transparent rounded-full animate-spin" /></div>;
   }
@@ -69,24 +79,62 @@ export default function CustomOrdersPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {orders.map((order) => (
-            <div key={order.id} className="bg-[#070707] border border-white/5 rounded-2xl p-6 flex flex-col lg:flex-row gap-6">
-              
+            <motion.div
+              key={order.id}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="bg-[#070707] border border-white/5 rounded-2xl p-6 flex flex-col lg:flex-row gap-6"
+            >
               {/* Order Info */}
               <div className="flex-1 space-y-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-bold text-white uppercase tracking-wider">{order.customer_name}</h3>
                     <p className="text-sm text-zinc-400 mt-1">{order.phone} {order.email && `• ${order.email}`}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Status</p>
-                    <select 
-                      value={order.status}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                      className={`text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border appearance-none cursor-pointer ${STATUS_COLORS[order.status] || STATUS_COLORS['Pending']}`}
-                    >
-                      {STATUS_OPTIONS.map(s => <option key={s} value={s} className="bg-black text-white">{s}</option>)}
-                    </select>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Status</p>
+                      <select 
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                        className={`text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border appearance-none cursor-pointer ${STATUS_COLORS[order.status] || STATUS_COLORS['Pending']}`}
+                      >
+                        {STATUS_OPTIONS.map(s => <option key={s} value={s} className="bg-black text-white">{s}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Delete Button */}
+                    {deleteConfirm === order.id ? (
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-[10px] text-red-400 uppercase font-bold tracking-widest">Confirm?</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDelete(order.id)}
+                            disabled={deleting === order.id}
+                            className="px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                          >
+                            {deleting === order.id ? "Deleting..." : "Yes, Delete"}
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirm(null)}
+                            className="px-3 py-1.5 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirm(order.id)}
+                        className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all border border-red-500/20 hover:border-red-500 mt-5"
+                        title="Delete order"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -145,7 +193,7 @@ export default function CustomOrdersPage() {
                 </a>
               </div>
               
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
