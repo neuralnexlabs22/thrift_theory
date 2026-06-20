@@ -59,7 +59,6 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
   }, [id]);
 
   const fetchData = async () => {
-    if (!supabase) return;
     setLoading(true);
     // Fetch bundle
     const { data: bData } = await supabase.from("bundles").select("*").eq("id", id).single();
