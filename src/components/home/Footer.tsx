@@ -36,7 +36,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <h3 className="font-[family-name:var(--font-serif)] text-3xl mb-6">
-              ThriftTheory
+              Thrift Theory
             </h3>
             <p className="font-[family-name:var(--font-sans)] text-white/70 mb-6 font-light leading-relaxed">
               Redefining luxury men's fashion through sustainability. Premium thrift, curated with care.
@@ -140,13 +140,12 @@ export function Footer() {
             </h4>
             <ul className="space-y-4 font-[family-name:var(--font-sans)] text-white/70 font-light">
               <li className="flex gap-3">
-                <MapPin className="w-5 h-5 flex-shrink-0 text-[#4C6B47]" />
-                <span>India</span>
+                <span>West Mambalam, Chennai</span>
               </li>
               <li className="flex gap-3 items-center">
                 <Phone className="w-5 h-5 flex-shrink-0 text-[#4C6B47]" />
-                <a href="tel:+1234567890" className="hover:text-[#4C6B47] transition-colors">
-                  +91 8122228386
+                <a href="tel:+917695923756" className="hover:text-[#4C6B47] transition-colors">
+                  076959 23756
                 </a>
               </li>
               <li className="flex gap-3 items-center">
@@ -163,7 +162,7 @@ export function Footer() {
         <div className="pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="font-[family-name:var(--font-sans)] text-white/50 text-sm">
-              © 2026 ThriftTheory. All rights reserved.
+              &copy; 2026 Thrift Theory. All rights reserved.
             </p>
             <div className="flex gap-6 font-[family-name:var(--font-sans)] text-white/50 text-sm">
               <a href="#" className="hover:text-[#4C6B47] transition-colors">

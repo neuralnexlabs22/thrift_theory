@@ -51,7 +51,7 @@ export default function ContactPage() {
                     <Phone className="w-6 h-6 text-[#4C6B47] mt-1" />
                     <div>
                       <p className="font-bold text-sm tracking-widest uppercase mb-1 font-[family-name:var(--font-sans)]">Phone</p>
-                      <a href="tel:+1234567890" className="text-[#355E3B] hover:text-[#004225] transition-colors font-light">+1 (234) 567-890</a>
+                      <a href="tel:+917695923756" className="text-[#355E3B] hover:text-[#004225] transition-colors font-light">076959 23756</a>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -59,9 +59,8 @@ export default function ContactPage() {
                     <div>
                       <p className="font-bold text-sm tracking-widest uppercase mb-1 font-[family-name:var(--font-sans)]">Studio</p>
                       <p className="text-[#355E3B] font-light leading-relaxed">
-                        123 Vintage Avenue<br />
-                        Design District<br />
-                        New York, NY 10001
+                        West Mambalam<br />
+                        Chennai, Tamil Nadu
                       </p>
                     </div>
                   </div>

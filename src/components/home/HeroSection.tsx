@@ -20,8 +20,8 @@ export function HeroSection() {
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-[#004225]/40 via-[#004225]/60 to-[#004225] z-10" />
         <img
-          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=1080&auto=format&fit=crop"
-          alt="Stack of vintage thrift shirts"
+          src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1080&auto=format&fit=crop"
+          alt="Premium minimalist clothing rack"
           className="w-full h-[120%] object-cover -top-[10%]"
         />
       </motion.div>
@@ -52,7 +52,7 @@ export function HeroSection() {
           </p>
           
           <h1 className="font-[family-name:var(--font-serif)] text-6xl lg:text-8xl mb-6 leading-[1.1] tracking-tight text-[#E8F0EA]">
-            THE 10 SHIRT<br />BUNDLE
+            10 SHIRTS FOR<br />₹1000
           </h1>
           
           <p className="font-[family-name:var(--font-sans)] text-xl lg:text-2xl text-[#E8F0EA]/90 mb-12 max-w-2xl mx-auto font-light tracking-wide">

@@ -16,6 +16,9 @@ import {
   Lock,
   Eye,
   EyeOff,
+  ShoppingBag,
+  Palette,
+  ClipboardList
 } from "lucide-react";
 import { useState } from "react";
 import { ProductProvider } from "@/context/ProductContext";
@@ -25,6 +28,10 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "All Products", icon: Package },
   { href: "/admin/products/add", label: "Add Product", icon: PlusCircle },
+  { href: "/admin/bundles", label: "Bundles", icon: ShoppingBag },
+  { href: "/admin/bundles/add", label: "Add Bundle", icon: PlusCircle },
+  { href: "/admin/custom-orders", label: "Custom Orders", icon: ClipboardList },
+  { href: "/admin/mockup-management", label: "Mockups & Colors", icon: Palette },
   { href: "/admin/brands", label: "Brands", icon: Tag },
   { href: "/admin/categories", label: "Categories", icon: Layers },
 ];
@@ -68,7 +75,7 @@ function AdminLoginScreen() {
             Admin Login
           </h1>
           <p className="text-[11px] text-zinc-500 tracking-wider uppercase mt-1">
-            ThriftTheory Dashboard
+            Thrift Theory Dashboard
           </p>
         </div>
 
@@ -217,11 +224,11 @@ function AdminDashboardShell({ children }: { children: React.ReactNode }) {
         <div className="p-5 border-b border-white/5">
           <Link href="/admin" className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-[#c9a227]/10 flex items-center justify-center border border-[#c9a227]/20">
-              <span className="text-[#c9a227] font-black text-sm tracking-tighter">ThriftTheory</span>
+              <span className="text-[#c9a227] font-black text-sm tracking-tighter">TT</span>
             </div>
             <div>
               <h1 className="text-sm font-black tracking-widest uppercase text-[#c9a227]">
-                ThriftTheory
+                Thrift Theory
               </h1>
               <p className="text-[10px] tracking-[0.2em] uppercase text-zinc-500">
                 Admin Panel

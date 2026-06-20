@@ -1,150 +1,378 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Search, SlidersHorizontal, Tag, Box, ChevronDown, ChevronUp } from "lucide-react";
 import { useProducts } from "@/context/ProductContext";
-
-const categories = [
-  {
-    name: "Hoodies",
-    slug: "hoodies",
-    tagline: "HEAVYWEIGHT FLEECE",
-    description: "Heavyweight drop-shoulder hoodies & premium blanks that hold their shape.",
-    image: "/images/categories/hoodies.png",
-  },
-  {
-    name: "T-Shirts",
-    slug: "t-shirts",
-    tagline: "VINTAGE BLANKS & TEES",
-    description: "Boxy fit, vintage-washed ringer tees and graphic streetwear essentials.",
-    image: "/images/categories/tees.png",
-  },
-  {
-    name: "Bottoms",
-    slug: "bottoms",
-    tagline: "UTILITY PANTS & CARGOS",
-    description: "Heavy canvas double-knee cargos and relaxed-fit utility bottoms.",
-    image: "/images/categories/bottoms.png",
-  },
-  {
-    name: "Outerwear",
-    slug: "outerwear",
-    tagline: "STREETWEAR SHELLS & VESTS",
-    description: "Vintage velvets, corduroy bomber jackets, and editorial streetwear layers.",
-    image: "/images/lookbook.png",
-  },
-  {
-    name: "Accessories",
-    slug: "accessories",
-    tagline: "ESSENTIAL FINISHING DETAILS",
-    description: "Thick double-layered ribbed beanies, street jewelry and styling caps.",
-    image: "/images/categories/accessories.png",
-  },
-];
+import { useCatalog } from "@/context/CatalogContext";
+import ProductCard from "@/components/ProductCard";
 
 export default function ShopMainPage() {
-  const { products, loaded } = useProducts();
+  const { products, loaded: productsLoaded } = useProducts();
+  const { brands, categories, loading: catalogLoading } = useCatalog();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isMobileCollapsed, setIsMobileCollapsed] = useState(true);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const getProductCount = (categoryName: string) => {
-    return products.filter(
-      (p) => p.category.toLowerCase() === categoryName.toLowerCase()
-    ).length;
+  const categoryBrands = useMemo(() => {
+    const uniqueBrands = new Map();
+    brands
+      .filter((b) => b.is_active !== false)
+      .forEach((b) => {
+        if (!uniqueBrands.has(b.name)) {
+          uniqueBrands.set(b.name, { name: b.name, description: b.description });
+        }
+      });
+    return Array.from(uniqueBrands.values());
+  }, [brands]);
+
+  const brandProductCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    products.forEach((p) => {
+      // If category is selected, only count products in that category
+      if (selectedCategory && p.category.toLowerCase() !== selectedCategory.toLowerCase()) return;
+      counts[p.brand] = (counts[p.brand] || 0) + 1;
+    });
+    return counts;
+  }, [products, selectedCategory]);
+
+  const categoryProductCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    products.forEach((p) => {
+      const catName = p.category.toLowerCase();
+      counts[catName] = (counts[catName] || 0) + 1;
+    });
+    return counts;
+  }, [products]);
+
+  const filteredBrandsList = useMemo(() => {
+    let list = categoryBrands;
+    // Only show brands that have products in the selected category
+    if (selectedCategory) {
+      list = list.filter(b => brandProductCounts[b.name] > 0);
+    }
+    if (!searchQuery.trim()) return list;
+    return list.filter((b) =>
+      b.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [categoryBrands, searchQuery, selectedCategory, brandProductCounts]);
+
+  const sortedAndFilteredProducts = useMemo(() => {
+    let result = [...products];
+
+    // Category filter
+    if (selectedCategory) {
+      result = result.filter((p) => p.category.toLowerCase() === selectedCategory.toLowerCase());
+    }
+
+    // Brand filter
+    if (selectedBrand) {
+      result = result.filter((p) => p.brand === selectedBrand);
+    }
+
+    // Sort order
+    if (sortBy === "price-low") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-high") {
+      result.sort((a, b) => b.price - a.price);
+    } else {
+      // Default: newest drop or featured first
+      result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+    }
+
+    return result;
+  }, [products, selectedCategory, selectedBrand, sortBy]);
+
+  const handleBrandSelect = (brandName: string | null) => {
+    setSelectedBrand(brandName);
+    scrollToProducts();
   };
 
-  return (
-    <div className="pt-32 pb-24 bg-[#F3F7F4] min-h-screen text-[#004225]">
-      {/* Header Banner */}
-      <div className="bg-[#004225] text-[#E8F0EA] border-b border-[#355E3B]/20 py-16 mb-16 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[200px] bg-[#355E3B]/20 rounded-full filter blur-[100px] pointer-events-none" />
-        
-        <div className="container mx-auto px-4 md:px-8 text-center relative z-10 max-w-4xl">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#E8F0EA]/70 hover:text-white transition-colors mb-6 group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
-          </Link>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-[family-name:var(--font-serif)] tracking-tight mb-4 flex items-center justify-center gap-4">
-            CURATED COLLECTIONS
-          </h1>
-          <p className="text-[#E8F0EA]/80 text-xs md:text-sm tracking-[0.25em] uppercase font-bold">
-            THRIFT THEORY &bull; EXCLUSIVE EDITS
-          </p>
-        </div>
+  const handleCategorySelect = (categoryName: string | null) => {
+    setSelectedCategory(categoryName);
+    setSelectedBrand(null); // Reset brand when changing category
+    scrollToProducts();
+  };
+
+  const scrollToProducts = () => {
+    setIsMobileCollapsed(true);
+    setIsScrolling(true);
+    setTimeout(() => {
+      const element = document.getElementById("products-section");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      setTimeout(() => setIsScrolling(false), 500);
+    }, 100);
+  };
+
+  if (!mounted || catalogLoading || !productsLoaded) {
+    return (
+      <div className="min-h-screen bg-background text-foreground pt-32 pb-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
+    );
+  }
 
+  return (
+    <div className="min-h-screen bg-background text-foreground pt-32 pb-24">
       <div className="container mx-auto px-4 md:px-8 max-w-[1400px]">
-        <div className="flex flex-col space-y-16 md:space-y-32">
-          {categories.map((cat, index) => (
-            <motion.div 
-              key={cat.slug}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className={`flex flex-col lg:flex-row gap-8 lg:gap-20 items-center ${
-                index % 2 !== 0 ? "lg:flex-row-reverse" : ""
-              }`}
-            >
-              {/* Collection Image */}
-              <div className="w-full lg:w-3/5 aspect-[4/3] relative overflow-hidden bg-[#355E3B] group rounded-sm shadow-2xl border border-[#4C6B47]/20">
-                <Link href={`/shop/${cat.slug}`} className="block w-full h-full">
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                    className="object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#004225]/80 via-[#004225]/20 to-transparent" />
-                  
-                  {/* Badge Overlay */}
-                  <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
-                    <div>
-                      <p className="text-[#E8F0EA]/80 text-[10px] tracking-[0.3em] font-bold uppercase mb-2">
-                        {cat.tagline}
-                      </p>
-                      <h3 className="text-3xl md:text-4xl font-[family-name:var(--font-serif)] text-white tracking-wide">
-                        {cat.name}
-                      </h3>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full">
-                      {mounted && loaded ? getProductCount(cat.name) : 0} Items
-                    </div>
+        {/* Breadcrumb Back Button */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors mb-8 group"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </Link>
+
+        {/* Main Grid: Sidebar + Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+          
+          {/* Left Column: Sidebar Filters */}
+          <div className="lg:col-span-1 space-y-8">
+            
+            {/* Categories Directory */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 border-b border-primary/10 pb-4 lg:border-0 lg:pb-0">
+                <SlidersHorizontal className="w-5 h-5 text-primary" />
+                <h3 className="text-sm font-black uppercase tracking-widest text-foreground">
+                  Categories
+                </h3>
+              </div>
+              
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => handleCategorySelect(null)}
+                  className={`w-full text-left px-4 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-between ${
+                    selectedCategory === null
+                      ? "bg-primary text-primary-foreground"
+                      : "text-foreground hover:bg-secondary hover:pl-5"
+                  }`}
+                >
+                  <span>All Clothing</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-sm shrink-0 ml-2 ${
+                    selectedCategory === null
+                      ? "bg-background text-foreground"
+                      : "bg-secondary text-foreground"
+                  }`}>
+                    {products.length}
+                  </span>
+                </button>
+
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => handleCategorySelect(c.name)}
+                    className={`w-full text-left px-4 py-3 text-xs font-bold transition-all rounded-xl flex items-center justify-between ${
+                      selectedCategory === c.name
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-secondary hover:pl-5 hover:text-primary"
+                    }`}
+                  >
+                    <span className="truncate">{c.name}</span>
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded-sm font-black shrink-0 ml-2 ${
+                        selectedCategory === c.name
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-primary text-primary-foreground"
+                      }`}
+                    >
+                      {categoryProductCounts[c.name.toLowerCase()] || 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Brands Directory */}
+            <div className="space-y-6">
+              <div
+                className="flex items-center justify-between cursor-pointer lg:cursor-default border-b border-primary/10 pb-4 lg:border-0 lg:pb-0"
+                onClick={() => setIsMobileCollapsed(!isMobileCollapsed)}
+              >
+                <div className="flex items-center gap-3">
+                  <Tag className="w-5 h-5 text-primary" />
+                  <h3 className="text-sm font-black uppercase tracking-widest text-foreground">
+                    Brands Directory
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-secondary text-foreground text-[10px] font-bold px-2 py-0.5 rounded-sm">
+                    {categoryBrands.length}
+                  </span>
+                  <div className="lg:hidden ml-2">
+                    {isMobileCollapsed ? (
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                    )}
                   </div>
-                </Link>
+                </div>
               </div>
 
-              {/* Collection Details */}
-              <div className="w-full lg:w-2/5 flex flex-col justify-center text-center lg:text-left px-4">
-                <span className="text-[#355E3B] uppercase tracking-[0.25em] text-[11px] font-bold mb-4">
-                  COLLECTION #0{index + 1}
-                </span>
-                <h2 className="font-[family-name:var(--font-serif)] text-4xl md:text-5xl text-[#004225] mb-6 tracking-tight">
-                  {cat.name}
-                </h2>
-                <p className="text-[#4C6B47] text-sm md:text-base leading-relaxed mb-10 font-light">
-                  {cat.description} Redefining the standard of premium styling through our curated {cat.name.toLowerCase()} capsule. Hand-picked for quality, style, and timeless appeal.
-                </p>
-                <Link
-                  href={`/shop/${cat.slug}`}
-                  className="inline-flex items-center space-x-3 text-white bg-[#004225] hover:bg-[#355E3B] transition-all px-8 py-4 rounded-sm text-xs font-bold uppercase tracking-widest shadow-lg mx-auto lg:mx-0 w-fit group"
-                >
-                  <span>Explore Edit</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+              {/* Active Filter display on mobile */}
+              {isMobileCollapsed && selectedBrand && (
+                <div className="lg:hidden flex items-center justify-between p-3 bg-secondary rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-xs font-bold text-foreground">{selectedBrand}</span>
+                    <span className="text-[9px] text-muted-foreground font-black">
+                      ({brandProductCounts[selectedBrand] || 0} items)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleBrandSelect(null)}
+                    className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+
+              {/* Collapsible Content */}
+              <div className={`space-y-4 ${isMobileCollapsed ? "hidden lg:block" : "block"}`}>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search brand name..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-secondary border border-primary/10 pl-10 pr-4 py-3 rounded-full text-xs text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                  />
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2" />
+                </div>
+
+                <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-2 scrollbar-thin">
+                  <button
+                    type="button"
+                    onClick={() => handleBrandSelect(null)}
+                    className={`w-full text-left px-4 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-between ${
+                      selectedBrand === null
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-secondary hover:pl-5"
+                    }`}
+                  >
+                    <span>All Brands</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-sm shrink-0 ml-2 ${
+                      selectedBrand === null
+                        ? "bg-background text-foreground"
+                        : "bg-secondary text-foreground"
+                    }`}>
+                      {selectedCategory 
+                        ? (products.filter(p => p.category.toLowerCase() === selectedCategory.toLowerCase()).length)
+                        : products.length}
+                    </span>
+                  </button>
+
+                  {filteredBrandsList.map((b) => (
+                    <button
+                      key={b.name}
+                      type="button"
+                      onClick={() => handleBrandSelect(b.name)}
+                      className={`w-full text-left px-4 py-3 text-xs font-bold transition-all rounded-xl flex items-center justify-between ${
+                        selectedBrand === b.name
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-secondary hover:pl-5 hover:text-primary"
+                      }`}
+                    >
+                      <span className="truncate">{b.name}</span>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-sm font-black shrink-0 ml-2 ${
+                          selectedBrand === b.name
+                            ? "bg-primary-foreground/20 text-primary-foreground"
+                            : "bg-primary text-primary-foreground"
+                        }`}
+                      >
+                        {brandProductCounts[b.name] || 0}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </motion.div>
-          ))}
+            </div>
+          </div>
+
+          {/* Right Column: Products Listing and View Controls */}
+          <div id="products-section" className="lg:col-span-3 space-y-8">
+            
+            {/* Category Header exactly like screenshot */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-primary/20 pb-6 relative">
+              {/* Accent marker */}
+              <div className="absolute left-0 top-0 bottom-6 w-1.5 bg-primary rounded-r-md"></div>
+              
+              <div className="pl-5">
+                <h1 className="text-3xl font-black uppercase tracking-widest text-primary mb-1">
+                  {selectedBrand ? selectedBrand : (selectedCategory || "ALL CLOTHING")}
+                </h1>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Premium {(selectedBrand || selectedCategory || "thrift").toLowerCase()} curation
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 pl-5 sm:pl-0">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-transparent border-0 text-[10px] font-bold uppercase tracking-widest text-muted-foreground focus:outline-none focus:text-primary cursor-pointer hover:text-foreground transition-colors"
+                >
+                  <option value="newest">Sort: Newest</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                </select>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  {sortedAndFilteredProducts.length} Items
+                </span>
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            <div className={`transition-opacity duration-300 ${isScrolling ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+              <AnimatePresence mode="wait">
+                {sortedAndFilteredProducts.length === 0 ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="border border-primary/10 bg-card p-16 text-center"
+                  >
+                    <Box className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+                    <h3 className="text-base font-bold uppercase tracking-widest mb-2">No Products Available</h3>
+                    <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+                      We couldn&apos;t find any products in this selection. Please try clearing your filters.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={`${selectedBrand}-${sortBy}`}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
+                  >
+                    {sortedAndFilteredProducts.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
     </div>

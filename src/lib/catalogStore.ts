@@ -338,12 +338,17 @@ async function resolveCategoryUuid(slugOrId: string): Promise<string | null> {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
   if (isUuid) return slugOrId;
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("categories")
     .select("id")
     .eq("slug", slugOrId)
-    .maybeSingle();
-  return data?.id ? String(data.id) : null;
+    .limit(1);
+  
+  if (error) {
+    console.error("Error resolving category UUID:", error);
+  }
+
+  return data && data.length > 0 ? String(data[0].id) : null;
 }
 
 export async function addCategory(
@@ -452,32 +457,47 @@ export async function deleteCategory(id: string): Promise<void> {
     try {
       const categoryUuid = await resolveCategoryUuid(id);
       if (!categoryUuid) {
-        throw new Error(`Category "${id}" not found in database`);
+        // Category doesn't exist in DB, it might have been already deleted
+        invalidateCatalogCache();
+        await loadCatalog(true);
+        return;
+      }
+
+      // Check for linked brands
+      const { data: linkedBrands, error: brandsError } = await supabase
+        .from("brands")
+        .select("id")
+        .eq("category_id", categoryUuid)
+        .limit(1);
+      
+      if (brandsError) throw brandsError;
+      if (linkedBrands && linkedBrands.length > 0) {
+        throw new Error("Cannot delete category because it has brands associated with it. Please delete the brands first.");
+      }
+
+      // Check for linked products
+      const { data: linkedProducts, error: productsError } = await supabase
+        .from("products")
+        .select("id")
+        .eq("category_id", categoryUuid)
+        .limit(1);
+        
+      if (productsError) throw productsError;
+      if (linkedProducts && linkedProducts.length > 0) {
+        throw new Error("Cannot delete category because it has products associated with it. Please delete the products first.");
       }
 
       const { error } = await supabase.from("categories").delete().eq("id", categoryUuid);
       if (error) {
-        console.error("Supabase deleteCategory error:", {
-          code: error?.code,
-          message: error?.message,
-          details: error?.details,
-          hint: error?.hint,
-        });
-        throw error;
+        throw new Error(error.message || "Failed to delete category in database");
       }
 
       // Refresh cache after successful delete
       invalidateCatalogCache();
       await loadCatalog(true);
     } catch (err: any) {
-      console.error("Supabase error:", {
-        code: err?.code,
-        message: err?.message,
-        details: err?.details,
-        hint: err?.hint,
-        fullError: JSON.stringify(err, null, 2)
-      });
-      throw new Error(err?.message || JSON.stringify(err) || "Unknown error");
+      console.error("Supabase deleteCategory error:", err);
+      throw new Error(err?.message || "An unknown error occurred while deleting the category");
     }
   } else {
     const catalog = memoryCache || getCatalogSync();

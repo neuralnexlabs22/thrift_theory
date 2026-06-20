@@ -2,7 +2,10 @@ export type AdminUploadBucket =
   | "product-images"
   | "category-images"
   | "brand-logos"
-  | "brand-banners";
+  | "brand-banners"
+  | "clothing-mockups"
+  | "bundle-images"
+  | "custom-designs";
 
 export async function uploadAdminImage(
   file: File,

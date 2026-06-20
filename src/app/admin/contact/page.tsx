@@ -143,7 +143,7 @@ export default function AdminContactPage() {
               type="text"
               value={whatsapp}
               onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="+919876543210"
+              placeholder="+917695923756"
               className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[var(--accent-1)] focus:outline-none"
             />
           </div>
@@ -156,7 +156,7 @@ export default function AdminContactPage() {
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+919876543210"
+              placeholder="076959 23756"
               className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[var(--accent-1)] focus:outline-none"
             />
           </div>
@@ -170,7 +170,7 @@ export default function AdminContactPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="contact@colourseven.com"
+            placeholder="hello@thrifttheory.com"
             className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[var(--accent-1)] focus:outline-none"
           />
         </div>
@@ -188,7 +188,7 @@ export default function AdminContactPage() {
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="123 Fashion Street"
+            placeholder="West Mambalam"
             className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[var(--accent-1)] focus:outline-none"
           />
         </div>
@@ -202,7 +202,7 @@ export default function AdminContactPage() {
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="Mumbai"
+              placeholder="Chennai"
               className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[var(--accent-1)] focus:outline-none"
             />
           </div>
@@ -215,7 +215,7 @@ export default function AdminContactPage() {
               type="text"
               value={state}
               onChange={(e) => setState(e.target.value)}
-              placeholder="Maharashtra"
+              placeholder="Tamil Nadu"
               className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:border-[var(--accent-1)] focus:outline-none"
             />
           </div>

@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ThriftTheory | Men's Premium Thrift",
+  title: "Thrift Theory | Men's Premium Thrift",
   description: "Curated premium thrift collections and mystery bundles for boys and men.",
 };
 

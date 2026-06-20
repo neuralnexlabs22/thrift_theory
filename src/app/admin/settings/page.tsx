@@ -10,11 +10,11 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" as "success" | "error" | "" });
 
-  const [siteName, setSiteName] = useState("ThriftTheory");
+  const [siteName, setSiteName] = useState("Thrift Theory");
   const [announcementText, setAnnouncementText] = useState("NEW ARRIVALS DROPPING EVERY WEEK 🛍️ / TRENDING WATCHES & FASHION ACCESSORIES ⌚");
   const [announcementEnabled, setAnnouncementEnabled] = useState(true);
-  const [seoTitle, setSeoTitle] = useState("ThriftTheory");
-  const [seoDescription, setSeoDescription] = useState("Premium modern streetwear, hoodies, tees & outerwear — ThriftTheory. WEAR UR STORY.");
+  const [seoTitle, setSeoTitle] = useState("Thrift Theory");
+  const [seoDescription, setSeoDescription] = useState("Premium modern streetwear, hoodies, tees & outerwear - Thrift Theory. WEAR UR STORY.");
   const [instagram, setInstagram] = useState("");
   const [twitter, setTwitter] = useState("");
   const [facebook, setFacebook] = useState("");

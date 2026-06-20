@@ -52,7 +52,7 @@ export default function CartSidebar() {
     message += "Please let me know if these are available and send payment details.";
 
     if (platform === "whatsapp") {
-      const whatsappUrl = `https://wa.me/918122228386?text=${encodeURIComponent(message)}`;
+      const whatsappUrl = `https://wa.me/917695923756?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, "_blank");
     } else if (platform === "instagram") {
       if (navigator.clipboard) {

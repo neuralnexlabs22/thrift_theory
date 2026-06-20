@@ -74,7 +74,7 @@ export default function AdminDashboard() {
           Dashboard
         </h1>
         <p className="text-zinc-500 mt-1">
-          Welcome to the ThriftTheory Admin Panel
+          Welcome to the Thrift Theory Admin Panel
         </p>
       </div>
 

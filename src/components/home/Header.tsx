@@ -42,7 +42,7 @@ export function Header() {
             <div className="flex-1 lg:flex-none text-center lg:text-left">
               <Link href="/">
                 <h1 className="font-[family-name:var(--font-serif)] tracking-wide text-[#004225]">
-                  <span className="text-2xl lg:text-3xl">ThriftTheory</span>
+                  <span className="text-2xl lg:text-3xl">Thrift Theory</span>
                 </h1>
               </Link>
             </div>

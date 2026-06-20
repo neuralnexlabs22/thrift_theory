@@ -44,7 +44,7 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-black uppercase tracking-[0.2em] text-white">
-            ThriftTheory
+            Thrift Theory
           </h1>
           <p className="text-[var(--accent-1)] text-xs font-bold tracking-[0.35em] uppercase mt-2">
             Admin Panel

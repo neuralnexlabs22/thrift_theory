@@ -45,7 +45,7 @@ export function BrandStory() {
 
             <div className="space-y-6 font-[family-name:var(--font-sans)] text-lg text-[#E8F0EA] font-light leading-relaxed">
               <p>
-                Founded in 2024, ThriftTheory reimagines the luxury men's thrift experience. We believe that sustainability 
+                Founded in 2024, Thrift Theory reimagines the luxury men's thrift experience. We believe that sustainability 
                 and style are not mutually exclusive—they're essential partners in creating a better fashion future for the modern gentleman.
               </p>
 

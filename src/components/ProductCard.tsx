@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Heart, Eye, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
@@ -50,26 +50,26 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className="group flex flex-col bg-card border border-primary/10 relative overflow-hidden transition-luxury hover:border-primary/40 hover:shadow-[0_12px_40px_rgba(138,115,80,0.08)]"
+      className="group flex flex-col relative transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Container with Square Aspect Ratio (Box-style) */}
-      <div className="relative aspect-square w-full overflow-hidden bg-secondary border-b border-primary/10">
+      {/* Image Container */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary rounded-xl">
         {product.isNew && (
-          <span className="absolute top-4 left-4 z-10 bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+          <span className="absolute top-3 left-3 z-10 bg-primary text-primary-foreground text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm shadow-md">
             NEW DROP
           </span>
         )}
         
         {product.stock === 0 && (
-          <span className="absolute top-4 left-4 z-10 bg-destructive text-destructive-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+          <span className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm shadow-md">
             SOLD OUT
           </span>
         )}
 
         {product.stock === 1 && (
-          <span className="absolute top-4 left-4 z-10 bg-amber-700 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+          <span className="absolute top-3 left-3 z-10 bg-amber-700 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-sm shadow-md">
             1 OF 1
           </span>
         )}
@@ -93,62 +93,51 @@ export default function ProductCard({ product }: ProductCardProps) {
               loading="lazy"
             />
           )}
+          {/* Subtle gradient overlay to ensure icons pop */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </Link>
 
-        {/* Hover Quick Action Buttons */}
+        {/* Hover Quick Action Buttons (Bottom Right) */}
         <div
-          className={`absolute bottom-4 left-4 right-4 flex gap-2 transition-all duration-300 ${
-            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          className={`absolute bottom-3 right-3 flex gap-2 transition-all duration-300 ${
+            isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
           }`}
         >
           <button
             type="button"
             onClick={handleWishlist}
-            className={`p-3 bg-background border border-primary/20 text-foreground hover:bg-primary hover:text-primary-foreground transition-colors`}
+            className="p-2.5 rounded-full bg-background/90 backdrop-blur-md text-foreground shadow-lg hover:bg-background transition-all hover:scale-105 active:scale-95"
             aria-label="Wishlist"
           >
             <Heart
-              className={`w-4 h-4 ${isWishlisted ? "fill-primary text-primary hover:text-primary-foreground" : ""}`}
+              className={`w-4 h-4 ${isWishlisted ? "fill-primary text-primary" : "text-foreground"}`}
             />
           </button>
-          
-          <Link
-            href={productUrl}
-            className="flex-1 flex items-center justify-center gap-2 py-3 bg-background border border-primary/20 text-xs font-bold uppercase tracking-widest text-foreground hover:bg-foreground hover:text-background hover:border-foreground transition-colors"
-          >
-            <Eye className="w-4 h-4" />
-            <span>View</span>
-          </Link>
 
           {product.stock !== 0 && (
             <button
               type="button"
               onClick={handleAddToCart}
-              className="p-3 bg-primary text-primary-foreground hover:bg-foreground hover:text-background transition-colors"
+              className="p-2.5 rounded-full bg-primary text-primary-foreground shadow-[0_4px_14px_rgba(0,66,37,0.4)] hover:brightness-110 transition-all hover:scale-105 active:scale-95"
               aria-label="Quick Add to Cart"
             >
-              <ShoppingCart className="w-4 h-4" />
+              <ShoppingBag className="w-4 h-4" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Info Section */}
-      <Link href={productUrl} className="flex flex-col p-5 flex-1 bg-card">
-        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-1.5">
-          {product.brand}
+      {/* Info Section - Left Aligned, Transparent */}
+      <Link href={productUrl} className="flex flex-col pt-4">
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-1">
+          {product.brand && product.brand !== "ThriftTheory" ? product.brand : product.category}
         </span>
-        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider line-clamp-1 group-hover:text-primary transition-colors duration-200">
+        <h3 className="text-sm font-black text-foreground uppercase tracking-widest line-clamp-1 group-hover:text-primary transition-colors duration-200">
           {product.name}
         </h3>
-        <div className="flex justify-between items-center mt-3 pt-3 border-t border-primary/5">
-          <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
-            {product.category}
-          </span>
-          <p className="text-sm font-bold text-foreground">
-            ₹{product.price.toLocaleString("en-IN")}
-          </p>
-        </div>
+        <p className="text-[13px] font-black text-primary mt-1.5">
+          ₹{product.price.toLocaleString("en-IN")}
+        </p>
       </Link>
     </div>
   );
