@@ -70,10 +70,11 @@ function normalizeBrands(brands: Brand[]): Brand[] {
 }
 
 function mapRemoteCategory(row: Record<string, unknown>): Category {
-  const slug = String(row.slug);
+  const slug = String(row.slug).toLowerCase().trim();
   return {
-    id: slug,
+    id: slug,         // Use slug as local ID for consistent matching
     slug,
+    db_id: String(row.id),  // Store real UUID for DB writes
     name: String(row.name),
     description: String(row.description || ""),
     image: String(row.image || ""),
@@ -103,20 +104,29 @@ async function fetchRemoteCatalog(): Promise<CatalogData | null> {
 
     if (brandError) throw brandError;
 
+    // Build both UUID→slug and slug→slug maps for reliable lookup
     const uuidToSlug = new Map<string, string>();
+    const slugToSlug = new Map<string, string>();
     const categories = (catRows || []).map((row) => {
       const cat = mapRemoteCategory(row as Record<string, unknown>);
-      uuidToSlug.set(String(row.id), cat.slug);
+      uuidToSlug.set(String(row.id), cat.slug);         // UUID → slug
+      slugToSlug.set(cat.slug, cat.slug);               // slug → slug (identity)
+      slugToSlug.set(String(row.id), cat.slug);         // also map UUID as key
       return cat;
     });
 
     const brands: Brand[] = (brandRows || []).map((row) => {
       const r = row as Record<string, unknown>;
-      const categorySlug = uuidToSlug.get(String(r.category_id)) || String(r.category_id);
+      const rawCategoryId = String(r.category_id);
+      // Resolve category_id: try UUID lookup first, then slug identity
+      const categorySlug =
+        uuidToSlug.get(rawCategoryId) ||
+        slugToSlug.get(rawCategoryId) ||
+        rawCategoryId.toLowerCase().trim();
       const name = String(r.name);
       return {
         id: buildBrandId(categorySlug, name),
-        category_id: categorySlug,
+        category_id: categorySlug,  // Always a slug, never a raw UUID
         name,
         slug: String(r.slug || slugifyName(name)),
         logo: String(r.logo || ""),
@@ -334,14 +344,22 @@ export function getBrandById(id: string): Brand | undefined {
 async function resolveCategoryUuid(slugOrId: string): Promise<string | null> {
   if (!supabase) return null;
   
-  // First check if it's already a UUID (match exact id)
+  // Check if it's already a UUID
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
   if (isUuid) return slugOrId;
 
+  // Try to find UUID from in-memory cache first (avoids extra DB round-trip)
+  const cached = getCatalogSync();
+  const cachedCat = cached.categories.find(
+    (c) => c.slug === slugOrId || c.id === slugOrId
+  ) as Category & { db_id?: string };
+  if (cachedCat?.db_id) return cachedCat.db_id;
+
+  // Fallback: query Supabase
   const { data, error } = await supabase
     .from("categories")
     .select("id")
-    .eq("slug", slugOrId)
+    .eq("slug", slugOrId.toLowerCase().trim())
     .limit(1);
   
   if (error) {

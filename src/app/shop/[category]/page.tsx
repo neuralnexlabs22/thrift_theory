@@ -43,8 +43,12 @@ export default function CategoryShopPage({ params }: { params: Promise<{ categor
 
   const categoryBrands = useMemo(() => {
     const uniqueBrands = new Map();
+    const normalizedSlug = categorySlug.toLowerCase().trim();
     brands
-      .filter((b) => b.category_id.toLowerCase() === categorySlug.toLowerCase() && b.is_active !== false)
+      .filter((b) => {
+        const bCat = b.category_id.toLowerCase().trim();
+        return (bCat === normalizedSlug) && b.is_active !== false;
+      })
       .forEach((b) => {
         if (!uniqueBrands.has(b.name)) {
           uniqueBrands.set(b.name, { name: b.name, description: b.description });
@@ -52,6 +56,7 @@ export default function CategoryShopPage({ params }: { params: Promise<{ categor
       });
     return Array.from(uniqueBrands.values());
   }, [brands, categorySlug]);
+
 
   const brandProductCounts = useMemo(() => {
     const counts: Record<string, number> = {};

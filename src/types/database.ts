@@ -8,9 +8,11 @@ export interface Category {
   icon?: string;
   display_order: number;
   is_active: boolean;
+  db_id?: string;   // Real Supabase UUID, used for DB writes
   created_at: string;
   updated_at: string;
 }
+
 
 export interface Brand {
   id: string;
