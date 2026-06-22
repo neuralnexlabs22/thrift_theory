@@ -30,7 +30,11 @@ export default function ShopMainPage() {
       .filter((b) => b.is_active !== false)
       .forEach((b) => {
         if (!uniqueBrands.has(b.name)) {
-          uniqueBrands.set(b.name, { name: b.name, description: b.description });
+          uniqueBrands.set(b.name, { 
+            name: b.name, 
+            description: b.description,
+            category_id: b.category_id 
+          });
         }
       });
     return Array.from(uniqueBrands.values());
@@ -57,15 +61,21 @@ export default function ShopMainPage() {
 
   const filteredBrandsList = useMemo(() => {
     let list = categoryBrands;
-    // Only show brands that have products in the selected category
+    // Show all brands that belong to the selected category (even if they have 0 products)
     if (selectedCategory) {
-      list = list.filter(b => brandProductCounts[b.name] > 0);
+      const selectedCatObj = categories.find(c => c.name.toLowerCase() === selectedCategory.toLowerCase());
+      if (selectedCatObj) {
+        list = list.filter(b => b.category_id === selectedCatObj.slug || b.category_id === selectedCatObj.id);
+      } else {
+        // Fallback to old behavior if category not found
+        list = list.filter(b => brandProductCounts[b.name] > 0);
+      }
     }
     if (!searchQuery.trim()) return list;
     return list.filter((b) =>
       b.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [categoryBrands, searchQuery, selectedCategory, brandProductCounts]);
+  }, [categoryBrands, searchQuery, selectedCategory, brandProductCounts, categories]);
 
   const sortedAndFilteredProducts = useMemo(() => {
     let result = [...products];
