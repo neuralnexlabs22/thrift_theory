@@ -60,7 +60,7 @@ async function fetchRemoteProducts(): Promise<Product[] | null> {
         images = sorted.map((img) => img.image_url);
       }
       if (images.length === 0) {
-        images = ["/images/chrono_watch.png"];
+        images = ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80"];
       }
 
       const rawVariants = r.product_variants as { size?: string; color?: string; stock_quantity?: number }[] | null;

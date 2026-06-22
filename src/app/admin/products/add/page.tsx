@@ -221,7 +221,7 @@ export default function AddProductPage() {
         images:
           validImages.length > 0
             ? validImages
-            : ["/images/chrono_watch.png"],
+            : ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80"],
         description:
           formData.fullDescription.trim() ||
           formData.shortDescription.trim() ||

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { Heart, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 const products = [
   {
@@ -95,19 +96,27 @@ export function ShopCollection() {
 
                 {/* Action Buttons */}
                 <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <button className="w-10 h-10 bg-[#004225] hover:bg-[#355E3B] text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300">
+                  <button 
+                    onClick={() => toast.success("Added to wishlist!")}
+                    className="w-10 h-10 bg-[#004225] hover:bg-[#355E3B] text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+                  >
                     <Heart className="w-4 h-4" />
                   </button>
-                  <button className="w-10 h-10 bg-[#004225] hover:bg-[#355E3B] text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300">
+                  <button 
+                    onClick={() => toast.success("Added to cart!")}
+                    className="w-10 h-10 bg-[#004225] hover:bg-[#355E3B] text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300"
+                  >
                     <ShoppingCart className="w-4 h-4" />
                   </button>
                 </div>
 
                 {/* Quick View */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                  <Button className="w-full bg-[#355E3B] hover:bg-[#4C6B47] text-white rounded-none font-[family-name:var(--font-sans)] tracking-wider text-sm border border-[#4C6B47]">
-                    QUICK VIEW
-                  </Button>
+                  <Link href="/shop">
+                    <Button className="w-full bg-[#355E3B] hover:bg-[#4C6B47] text-white rounded-none font-[family-name:var(--font-sans)] tracking-wider text-sm border border-[#4C6B47]">
+                      QUICK VIEW
+                    </Button>
+                  </Link>
                 </div>
               </div>
 

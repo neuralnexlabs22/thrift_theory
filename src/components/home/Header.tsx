@@ -3,6 +3,7 @@ import { ShoppingBag, Search, User, Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { toast } from 'sonner';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -80,10 +81,10 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-4 text-[#004225]">
-              <button className="hidden lg:block p-2 hover:bg-[#004225]/5 rounded-lg transition-colors">
+              <button onClick={() => toast.info('Search feature coming soon!')} className="hidden lg:block p-2 hover:bg-[#004225]/5 rounded-lg transition-colors">
                 <Search className="w-5 h-5" />
               </button>
-              <button className="hidden sm:block p-2 hover:bg-[#004225]/5 rounded-lg transition-colors">
+              <button onClick={() => toast.info('User accounts coming soon!')} className="hidden sm:block p-2 hover:bg-[#004225]/5 rounded-lg transition-colors">
                 <User className="w-5 h-5" />
               </button>
               <button onClick={toggleCart} className="p-2 hover:bg-[#004225]/5 rounded-lg transition-colors relative">
@@ -154,7 +155,10 @@ export function Header() {
                 ))}
               </nav>
               <div className="p-6 border-t border-[#004225]/10 flex gap-4">
-                <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#004225] text-[#004225] uppercase text-xs tracking-wider hover:bg-[#004225] hover:text-white transition-colors">
+                <button onClick={() => toast.info('Search feature coming soon!')} className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#004225] text-[#004225] uppercase text-xs tracking-wider hover:bg-[#004225] hover:text-white transition-colors">
+                  <Search className="w-4 h-4" /> Search
+                </button>
+                <button onClick={() => toast.info('User accounts coming soon!')} className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#004225] text-white uppercase text-xs tracking-wider hover:bg-[#355E3B] transition-colors">
                   <User className="w-4 h-4" /> Account
                 </button>
               </div>

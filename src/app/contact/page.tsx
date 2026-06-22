@@ -70,13 +70,13 @@ export default function ContactPage() {
               <div>
                 <h2 className="text-2xl font-[family-name:var(--font-serif)] mb-6">Follow Us</h2>
                 <div className="flex gap-4">
-                  <a href="#" className="w-12 h-12 border border-[#4C6B47]/30 rounded-full flex items-center justify-center text-[#004225] font-bold text-sm hover:bg-[#004225] hover:text-white transition-all duration-300">
+                  <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-12 h-12 border border-[#4C6B47]/30 rounded-full flex items-center justify-center text-[#004225] font-bold text-sm hover:bg-[#004225] hover:text-white transition-all duration-300">
                     IG
                   </a>
-                  <a href="#" className="w-12 h-12 border border-[#4C6B47]/30 rounded-full flex items-center justify-center text-[#004225] font-bold text-sm hover:bg-[#004225] hover:text-white transition-all duration-300">
-                    X
+                  <a href="https://twitter.com" target="_blank" rel="noreferrer" className="w-12 h-12 border border-[#4C6B47]/30 rounded-full flex items-center justify-center text-[#004225] font-bold text-sm hover:bg-[#004225] hover:text-white transition-all duration-300">
+                    TW
                   </a>
-                  <a href="#" className="w-12 h-12 border border-[#4C6B47]/30 rounded-full flex items-center justify-center text-[#004225] font-bold text-sm hover:bg-[#004225] hover:text-white transition-all duration-300">
+                  <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-12 h-12 border border-[#4C6B47]/30 rounded-full flex items-center justify-center text-[#004225] font-bold text-sm hover:bg-[#004225] hover:text-white transition-all duration-300">
                     FB
                   </a>
                 </div>
