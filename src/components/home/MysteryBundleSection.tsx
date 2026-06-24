@@ -28,7 +28,7 @@ const bundles = [
     id: 3,
     name: 'Design Customisation',
     description: 'Transform your artwork into premium wearable vintage pieces',
-    price: '₹8,999',
+    price: '₹499',
     image: 'https://images.unsplash.com/photo-1578198576866-7e0ba6078128?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZW5zJTIwdmludGFnZSUyMGphY2tldCUyMGZhc2hpb258ZW58MXx8fHwxNzgxNzk3MTM0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     badge: 'Exclusive',
     href: '/custom',

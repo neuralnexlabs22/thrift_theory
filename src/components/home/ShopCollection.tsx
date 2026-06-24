@@ -5,7 +5,9 @@ import { Heart, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-const products = [
+import { useProducts } from '@/context/ProductContext';
+
+const defaultProducts = [
   {
     id: 1,
     name: 'Vintage Denim Jacket',
@@ -45,6 +47,21 @@ const products = [
 ];
 
 export function ShopCollection() {
+  const { products: storeProducts, loaded } = useProducts();
+
+  const displayProducts = storeProducts.length > 0
+    ? storeProducts.slice(0, 4).map(p => ({
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        price: `₹${p.price}`,
+        originalPrice: '',
+        image: p.images?.[0] || 'https://via.placeholder.com/400x500',
+        badge: p.isNew ? 'New' : (p.isTrending ? 'Trending' : ''),
+        slug: p.slug || p.id
+      }))
+    : defaultProducts;
+
   return (
     <section className="py-32 bg-[#004225]">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12">
@@ -70,7 +87,7 @@ export function ShopCollection() {
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {products.map((product, index) => (
+          {displayProducts.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 60 }}
@@ -88,11 +105,13 @@ export function ShopCollection() {
                 />
                 
                 {/* Badge */}
-                <div className="absolute top-4 left-4">
-                  <span className="bg-[#4C6B47] text-white px-3 py-1.5 text-xs font-[family-name:var(--font-sans)] tracking-wider uppercase">
-                    {product.badge}
-                  </span>
-                </div>
+                {product.badge && (
+                  <div className="absolute top-4 left-4">
+                    <span className="bg-[#4C6B47] text-white px-3 py-1.5 text-xs font-[family-name:var(--font-sans)] tracking-wider uppercase">
+                      {product.badge}
+                    </span>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -112,7 +131,7 @@ export function ShopCollection() {
 
                 {/* Quick View */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                  <Link href="/shop">
+                  <Link href={`/products/${'slug' in product ? product.slug : product.id}`}>
                     <Button className="w-full bg-[#355E3B] hover:bg-[#4C6B47] text-white rounded-none font-[family-name:var(--font-sans)] tracking-wider text-sm border border-[#4C6B47]">
                       QUICK VIEW
                     </Button>
