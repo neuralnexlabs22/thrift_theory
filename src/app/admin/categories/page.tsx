@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useCatalog } from "@/context/CatalogContext";
 import { Plus, Eye, EyeOff, Trash2, Layers, Edit2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function AdminCategoriesPage() {
   const { categories, loading, deleteCategory, updateCategory, addCategory, refresh } =
@@ -30,9 +31,9 @@ export default function AdminCategoriesPage() {
       await deleteCategory(id);
       await refresh();
       setDeleteConfirm(null);
+      toast.success("Category deleted successfully.");
     } catch (err: any) {
-      console.error("Failed to delete category:", err);
-      alert(err?.message || "Failed to delete category");
+      toast.error(err?.message || "Failed to delete category");
     }
   };
 

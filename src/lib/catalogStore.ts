@@ -147,7 +147,7 @@ async function fetchRemoteCatalog(): Promise<CatalogData | null> {
 
     return { categories, brands: filteredBrands };
   } catch (error: any) {
-    console.error("Supabase error:", {
+    console.warn("Supabase error:", {
       message: error?.message,
       details: error?.details,
       hint: error?.hint,
@@ -441,7 +441,7 @@ export async function updateCategory(
       invalidateCatalogCache();
       await loadCatalog(true);
     } catch (err: any) {
-      console.error("Supabase error:", {
+      console.warn("Supabase error:", {
         message: err?.message,
         details: err?.details,
         hint: err?.hint,
@@ -514,7 +514,7 @@ export async function deleteCategory(id: string): Promise<void> {
       invalidateCatalogCache();
       await loadCatalog(true);
     } catch (err: any) {
-      console.error("Supabase deleteCategory error:", err);
+      console.warn("Supabase deleteCategory warning:", err.message || err);
       throw new Error(err?.message || "An unknown error occurred while deleting the category");
     }
   } else {
@@ -578,7 +578,7 @@ export async function addBrand(
       const refreshed = await loadCatalog(true);
       return refreshed.brands.find((b) => b.id === brand.id) || brand;
     } catch (err: any) {
-      console.error("Supabase error:", err);
+      console.warn("Supabase error:", err);
       throw new Error(err?.message || "Unknown error");
     }
   } else {
@@ -642,7 +642,7 @@ export async function updateBrand(
       invalidateCatalogCache();
       await loadCatalog(true);
     } catch (err: any) {
-      console.error("Supabase error:", {
+      console.warn("Supabase error:", {
         message: err?.message,
         details: err?.details,
         hint: err?.hint,
@@ -695,7 +695,7 @@ export async function deleteBrand(id: string): Promise<void> {
       invalidateCatalogCache();
       await loadCatalog(true);
     } catch (err: any) {
-      console.error("Supabase error:", {
+      console.warn("Supabase error:", {
         message: err?.message,
         details: err?.details,
         hint: err?.hint,
