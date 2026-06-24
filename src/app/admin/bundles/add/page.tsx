@@ -2,11 +2,10 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { uploadAdminImage, uploadAdminRemoteUrl } from "@/lib/imageUpload";
-import { ArrowLeft, Save, Upload, X, Loader, CheckCircle, AlertCircle } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { ArrowLeft, Upload, X, Loader, AlertCircle, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 function convertGoogleDriveUrl(url: string): string {
   const trimmed = url.trim();
@@ -24,8 +23,6 @@ function convertGoogleDriveUrl(url: string): string {
 
 export default function AddBundlePage() {
   const router = useRouter();
-  
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" as "success" | "error" });
   const [uploadingImages, setUploadingImages] = useState<boolean[]>(new Array(5).fill(false));
@@ -145,7 +142,13 @@ export default function AddBundlePage() {
     }));
   };
 
-  const handleAdd = async (e: FormEvent) => {
+  const normalizePriceValue = (value: string) => {
+    const cleaned = value.trim().replace(/[^\d.]/g, "");
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setMessage({ text: "", type: "" as "success" | "error" });
     
@@ -157,234 +160,404 @@ export default function AddBundlePage() {
     setSaving(true);
     if (!supabase) return;
     
-    const validImages = imageUrls.filter((url) => url.trim() !== "");
-    const mainImage = validImages.length > 0 ? validImages[0] : "/images/mystery_bundle_box.png";
+    try {
+      const validImages = imageUrls.filter((url) => url.trim() !== "");
+      const mainImage = validImages.length > 0 ? validImages[0] : "/images/mystery_bundle_box.png";
+      const price = normalizePriceValue(formData.price);
 
-    const { error: insertError } = await supabase.from("bundles").insert({
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      items_count: parseInt(formData.itemsCount),
-      image_url: mainImage,
-      images: validImages,
-      sizes: formData.sizes,
-      colors: formData.colors,
-      is_active: formData.isActive
-    });
-    
-    if (insertError) {
-      setMessage({ text: insertError.message, type: "error" });
-      setSaving(false);
-    } else {
+      const { error: insertError } = await supabase.from("bundles").insert({
+        name: formData.name,
+        description: formData.description,
+        price,
+        items_count: parseInt(formData.itemsCount),
+        image_url: mainImage,
+        images: validImages,
+        sizes: formData.sizes,
+        colors: formData.colors,
+        is_active: formData.isActive
+      });
+      
+      if (insertError) {
+        throw insertError;
+      }
+      
       setMessage({ text: "✓ Bundle added successfully!", type: "success" });
       setTimeout(() => router.push("/admin/bundles"), 1500);
+    } catch (error) {
+      console.error("Error:", error);
+      setMessage({ text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`, type: "error" });
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="space-y-6"
-    >
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/admin/bundles" className="p-2 rounded-xl hover:bg-white/5 text-zinc-400 hover:text-white transition-all">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight font-serif">Add Bundle</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">Create a new mystery bundle for your customers</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/admin/bundles" className="px-5 py-2.5 rounded-xl text-sm font-bold text-white hover:bg-white/5 transition-colors border border-white/10">
-            Cancel
-          </Link>
-          <button onClick={handleAdd} disabled={saving} className="flex items-center gap-2 bg-[var(--accent-1)] text-black px-5 py-2.5 rounded-xl font-black uppercase tracking-widest text-xs hover:brightness-110 disabled:opacity-50 transition-all">
-            {saving ? <><Loader className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Bundle</>}
-          </button>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/admin/bundles"
+          className="p-2 rounded-xl hover:bg-white/5 text-zinc-400 hover:text-white transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight font-serif">
+            Add Bundle
+          </h1>
+          <p className="text-zinc-500 text-sm mt-0.5">
+            Create a new mystery bundle for your customers
+          </p>
         </div>
       </div>
 
       {/* Messages */}
       {message.text && (
-        <div className={`p-4 rounded-xl border flex items-center gap-3 ${message.type === "success" ? "bg-green-500/10 border-green-500/30 text-green-400" : "bg-red-500/10 border-red-500/30 text-red-400"}`}>
-          {message.type === "success" ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-          <p className="font-medium text-sm">{message.text}</p>
+        <div className={`p-4 rounded-lg border flex items-start gap-3 ${
+          message.type === "success"
+            ? "bg-green-500/10 border-green-500 text-green-400"
+            : "bg-red-500/10 border-red-500 text-red-400"
+        }`}>
+          {message.type === "success" ? (
+            <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          )}
+          <p className="font-medium">{message.text}</p>
         </div>
       )}
 
-      {/* Main Layout */}
-      <form onSubmit={handleAdd} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-6 bg-zinc-900/50 border border-white/5 rounded-2xl p-6">
         
-        {/* Left Column - Details */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Basic Info */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Basic Information</h3>
           
-          {/* Basic Information */}
-          <div className="bg-[#070707] border border-white/5 rounded-2xl p-6 space-y-6">
-            <h2 className="text-xl font-black uppercase tracking-wider text-white">Basic Information</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Bundle Name *</label>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="e.g. 5 Shirts Bundle" className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Description</label>
-                <textarea name="description" value={formData.description} onChange={handleInputChange} rows={6} placeholder="Describe what's in the bundle..." className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors resize-none" />
-              </div>
-            </div>
+          <div className="space-y-2">
+            <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
+              Bundle Name *
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              placeholder="e.g. 5 Shirts Mystery Bundle"
+              className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors"
+            />
           </div>
 
-          {/* Pricing & Quantity */}
-          <div className="bg-[#070707] border border-white/5 rounded-2xl p-6 space-y-6">
-            <h2 className="text-xl font-black uppercase tracking-wider text-white">Pricing & Capacity</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Price (₹) *</label>
-                <input type="number" name="price" value={formData.price} onChange={handleInputChange} required min="0" step="0.01" placeholder="0.00" className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Items Count *</label>
-                <input type="number" name="itemsCount" value={formData.itemsCount} onChange={handleInputChange} required min="1" placeholder="e.g. 5" className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
-              </div>
-            </div>
+          <div className="space-y-2">
+            <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows={4}
+              placeholder="Detailed bundle description with features and benefits..."
+              className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors resize-none"
+            />
           </div>
-
-          {/* Variants */}
-          <div className="bg-[#070707] border border-white/5 rounded-2xl p-6 space-y-6">
-            <h2 className="text-xl font-black uppercase tracking-wider text-white">Variants</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Sizes */}
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Available Sizes</label>
-                <div className="flex gap-2">
-                  <input type="text" value={sizeInput} onChange={(e) => setSizeInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag(sizeInput, setSizeInput, "sizes"))} placeholder="e.g. L, XL, XXL" className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
-                  <button type="button" onClick={() => addTag(sizeInput, setSizeInput, "sizes")} className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors text-sm font-medium">Add</button>
-                </div>
-                {formData.sizes.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {formData.sizes.map((size) => (
-                      <span key={size} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-sm">
-                        {size}
-                        <button type="button" onClick={() => removeTag(size, "sizes")} className="text-zinc-400 hover:text-white"><X className="w-3 h-3" /></button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Colors */}
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Available Colors</label>
-                <div className="flex gap-2">
-                  <input type="text" value={colorInput} onChange={(e) => setColorInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag(colorInput, setColorInput, "colors"))} placeholder="e.g. Black, White" className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
-                  <button type="button" onClick={() => addTag(colorInput, setColorInput, "colors")} className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors text-sm font-medium">Add</button>
-                </div>
-                {formData.colors.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {formData.colors.map((color) => (
-                      <span key={color} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-1)]/20 text-[var(--accent-1)] text-sm">
-                        {color}
-                        <button type="button" onClick={() => removeTag(color, "colors")} className="text-[var(--accent-1)] hover:text-white"><X className="w-3 h-3" /></button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        {/* Right Column - Images & Status */}
-        <div className="space-y-6">
+        {/* Pricing & Capacity */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Pricing & Capacity</h3>
           
-          {/* Images */}
-          <div className="bg-[#070707] border border-white/5 rounded-2xl p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black uppercase tracking-wider text-white">Images</h2>
-              <span className="text-xs text-zinc-500">{imageUrls.filter(u => u.trim() !== "").length} / 5</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
+                Price (₹) *
+              </label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleInputChange}
+                onWheel={(e) => e.currentTarget.blur()}
+                required
+                min="0"
+                step="0.01"
+                placeholder="999"
+                className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors"
+              />
             </div>
+            
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
+                Items Count *
+              </label>
+              <input
+                type="number"
+                name="itemsCount"
+                value={formData.itemsCount}
+                onChange={handleInputChange}
+                onWheel={(e) => e.currentTarget.blur()}
+                required
+                min="1"
+                placeholder="5"
+                className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors"
+              />
+            </div>
+          </div>
+        </div>
 
-            <div className="space-y-4">
-              {[0, 1, 2, 3, 4].map((index) => (
-                <div key={index} className="space-y-2">
-                  <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">
-                    {index === 0 ? "Main Image (Cover) *" : `Gallery Image ${index}`}
-                  </div>
-                  
-                  {imagePreviews[index] && (
-                    <div className="relative w-full aspect-square bg-black border border-white/10 rounded-xl overflow-hidden mb-2 group">
-                      <img src={imagePreviews[index]} alt={`Preview ${index}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button type="button" onClick={() => {
-                          const newUrls = [...imageUrls]; newUrls[index] = ""; setImageUrls(newUrls);
-                          const newPreviews = [...imagePreviews]; newPreviews[index] = ""; setImagePreviews(newPreviews);
-                        }} className="p-2 bg-red-500 rounded-lg text-white hover:bg-red-600 transition-colors">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {!imagePreviews[index] && (
-                    <label
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={(e) => handleDrop(e, index)}
-                      className="flex flex-col items-center justify-center gap-2 w-full aspect-video border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-[var(--accent-1)] hover:bg-white/5 transition-all bg-black"
-                    >
-                      {uploadingImages[index] ? (
-                        <><Loader className="w-5 h-5 animate-spin text-[var(--accent-1)]" /><span className="text-xs text-zinc-500">Uploading...</span></>
-                      ) : (
-                        <><Upload className="w-5 h-5 text-zinc-600" /><span className="text-xs text-zinc-500">Drop image here</span></>
-                      )}
-                      <input type="file" accept="image/*" onChange={(e) => { if (e.target.files?.[0]) handleImageUpload(index, e.target.files[0]); }} disabled={uploadingImages[index]} className="hidden" />
-                    </label>
-                  )}
-
-                  <input type="text" value={imageUrls[index]} onChange={(e) => handleImageUrlChange(index, e.target.value)} placeholder="Or paste image URL" className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
+        {/* Bundle Images */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Bundle Images</h3>
+          <p className="text-xs text-zinc-400">Upload images or paste image URLs (up to 5)</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="space-y-2">
+                <div className="text-xs text-zinc-500 font-medium">
+                  {index === 0 ? "Main Image" : `Image ${index + 1}`}
+                  {index < 2 && <span className="text-[var(--accent-1)] ml-1">*</span>}
                 </div>
+
+                {/* Preview */}
+                {imagePreviews[index] && (
+                  <div className="relative w-full h-32 bg-black border border-white/10 rounded-lg overflow-hidden">
+                    <img
+                      src={imagePreviews[index]}
+                      alt={`Preview ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newUrls = [...imageUrls];
+                        newUrls[index] = "";
+                        setImageUrls(newUrls);
+                        const newPreviews = [...imagePreviews];
+                        newPreviews[index] = "";
+                        setImagePreviews(newPreviews);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 rounded text-white hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+
+                {/* URL Input */}
+                <input
+                  type="text"
+                  value={imageUrls[index]}
+                  onChange={(e) => handleImageUrlChange(index, e.target.value)}
+                  placeholder="Paste image URL or upload below"
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors text-sm"
+                />
+                <div className="flex gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const url = imageUrls[index];
+                      if (!url) return setMessage({ text: "No URL to import", type: "error" });
+                      try {
+                        setUploadingImages((s) => {
+                          const copy = [...s];
+                          copy[index] = true;
+                          return copy;
+                        });
+                        const publicUrl = await uploadAdminRemoteUrl(url, "bundle-images", "bundles");
+                        const newUrls = [...imageUrls];
+                        newUrls[index] = publicUrl;
+                        setImageUrls(newUrls);
+                        const newPreviews = [...imagePreviews];
+                        newPreviews[index] = publicUrl;
+                        setImagePreviews(newPreviews);
+                        setMessage({ text: "✓ Image imported to storage", type: "success" });
+                      } catch (err) {
+                        setMessage({ text: `Import failed: ${err instanceof Error ? err.message : String(err)}`, type: "error" });
+                      } finally {
+                        setUploadingImages((s) => {
+                          const copy = [...s];
+                          copy[index] = false;
+                          return copy;
+                        });
+                      }
+                    }}
+                    className="px-3 py-2 bg-[var(--accent-1)] rounded text-black text-xs font-medium hover:brightness-105 transition-all"
+                  >
+                    Import URL
+                  </button>
+                  <span className="text-xs text-zinc-500 self-center">or upload below</span>
+                </div>
+
+                {/* Upload */}
+                <label
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, index)}
+                  className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-white/20 rounded-lg px-3 py-2 cursor-pointer hover:border-[var(--accent-1)] hover:bg-white/5 transition-all"
+                >
+                  {uploadingImages[index] ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin text-[var(--accent-1)]" />
+                      <span className="text-xs text-zinc-400">Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4 text-zinc-400" />
+                      <span className="text-xs text-zinc-400">Upload Image</span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        handleImageUpload(index, e.target.files[0]);
+                      }
+                    }}
+                    disabled={uploadingImages[index]}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Variants */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Variants Options</h3>
+
+          {/* Sizes */}
+          <div className="space-y-2">
+            <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
+              Sizes
+            </label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.sizes.map((size) => (
+                <span
+                  key={size}
+                  className="flex items-center gap-1.5 text-xs bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-lg font-medium"
+                >
+                  {size}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(size, "sizes")}
+                    className="hover:text-white transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
               ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={sizeInput}
+                onChange={(e) => setSizeInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag(sizeInput, setSizeInput, "sizes");
+                  }
+                }}
+                placeholder="Type size and press Enter (e.g. M, L, XL)"
+                className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => addTag(sizeInput, setSizeInput, "sizes")}
+                className="px-4 py-3 bg-[var(--accent-1)] text-black rounded-lg font-bold hover:brightness-110 transition-all"
+              >
+                Add
+              </button>
             </div>
           </div>
 
-          {/* Status */}
-          <div className="bg-[#070707] border border-white/5 rounded-2xl p-6 space-y-6">
-            <h2 className="text-xl font-black uppercase tracking-wider text-white">Status</h2>
-            
-            <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl border border-white/10 hover:border-white/20 transition-colors bg-black">
-              <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleInputChange} className="w-5 h-5 rounded border-white/20 accent-[var(--accent-1)]" />
+          {/* Colors */}
+          <div className="space-y-2">
+            <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
+              Colors
+            </label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.colors.map((color) => (
+                <span
+                  key={color}
+                  className="flex items-center gap-1.5 text-xs bg-[var(--accent-1)]/10 text-[var(--accent-1)] px-3 py-1.5 rounded-lg font-medium"
+                >
+                  {color}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(color, "colors")}
+                    className="hover:text-white transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={colorInput}
+                onChange={(e) => setColorInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag(colorInput, setColorInput, "colors");
+                  }
+                }}
+                placeholder="Type color and press Enter (e.g. Black, White)"
+                className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => addTag(colorInput, setColorInput, "colors")}
+                className="px-4 py-3 bg-[var(--accent-1)] text-black rounded-lg font-bold hover:brightness-110 transition-all"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Status */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white">Status</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+            <label className="flex items-center gap-3 cursor-pointer p-4 rounded-lg border border-white/10 hover:border-white/20 transition-colors">
+              <input
+                type="checkbox"
+                name="isActive"
+                checked={formData.isActive}
+                onChange={handleInputChange}
+                className="w-4 h-4 rounded border-white/20 accent-[var(--accent-1)]"
+              />
               <span className="text-sm text-white font-medium">Active / Published</span>
             </label>
           </div>
-
         </div>
 
-        <div className="lg:col-span-3 mt-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full flex items-center justify-center gap-2 bg-[var(--accent-1)] text-black font-black uppercase tracking-widest text-sm px-6 py-4 rounded-xl hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            {saving ? (
-              <>
-                <Loader className="w-5 h-5 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-5 h-5" />
-                Save Bundle
-              </>
-            )}
-          </button>
-        </div>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full flex items-center justify-center gap-2 bg-[var(--accent-1)] text-black font-black uppercase tracking-widest text-sm px-6 py-4 rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          {saving ? (
+            <>
+              <Loader className="w-4 h-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Upload className="w-4 h-4" />
+              Add Bundle
+            </>
+          )}
+        </button>
       </form>
-    </motion.div>
+    </div>
   );
 }
