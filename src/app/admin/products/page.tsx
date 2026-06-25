@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Search, Edit2, Trash2, Plus, Package } from "lucide-react";
 import { useProducts } from "@/context/ProductContext";
+import { useCatalog } from "@/context/CatalogContext";
 
 const currency = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -12,10 +13,11 @@ const currency = new Intl.NumberFormat("en-IN", {
   maximumFractionDigits: 0,
 });
 
-const categories = ["All", "Watches", "Shoes", "Clothing", "Accessories"] as const;
-
 export default function AdminProductsPage() {
   const { products, deleteProduct } = useProducts();
+  const { categories: rawCategories } = useCatalog();
+  const categories = ["All", ...rawCategories.filter(c => c.is_active).map(c => c.name)];
+  
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("All");
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
