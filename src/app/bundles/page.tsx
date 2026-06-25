@@ -12,7 +12,7 @@ export default function MysteryBundlesPage() {
   const [bundles, setBundles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSizes, setSelectedSizes] = useState<Record<string, string>>({});
-  const [expandedTerms, setExpandedTerms] = useState<Record<string, boolean>>({});
+  const [expandedTerms, setExpandedTerms] = useState(false);
   const { addToCart, toggleCart } = useCart();
 
   useEffect(() => {
@@ -27,10 +27,6 @@ export default function MysteryBundlesPage() {
 
   const handleSizeSelect = (bundleId: string, size: string) => {
     setSelectedSizes(prev => ({ ...prev, [bundleId]: size }));
-  };
-
-  const toggleTerms = (bundleId: string) => {
-    setExpandedTerms(prev => ({ ...prev, [bundleId]: !prev[bundleId] }));
   };
 
   const handleAddToCart = (bundle: any) => {
@@ -82,6 +78,55 @@ export default function MysteryBundlesPage() {
               {bundles.length} Bundles Available
             </span>
           </div>
+        </div>
+
+        {/* Global T&C Accordion for Mystery Bundles */}
+        <div className="mb-12 bg-secondary/30 border border-primary/20 rounded-xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] backdrop-blur-md transition-colors hover:bg-secondary/40">
+          <button
+            onClick={() => setExpandedTerms(!expandedTerms)}
+            className="w-full flex items-center justify-between p-4 text-left transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Info className="w-5 h-5 text-primary" />
+              <span className="text-[13px] font-bold uppercase tracking-widest text-foreground">
+                Terms & Conditions
+              </span>
+            </div>
+            <motion.div
+              animate={{ rotate: expandedTerms ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            </motion.div>
+          </button>
+          
+          <AnimatePresence>
+            {expandedTerms && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden"
+              >
+                <div className="p-5 pt-2 border-t border-primary/10 bg-secondary/10 text-[13px] text-muted-foreground leading-relaxed space-y-4">
+                  <p className="font-bold text-foreground text-sm">Mystery Bundle Policy</p>
+                  <ul className="space-y-3 list-disc pl-5">
+                    <li>The 10 clothing items included in this bundle are selected completely at random from our available inventory.</li>
+                    <li>Customers cannot request or choose specific brands, colors, prints, graphics, or designs.</li>
+                    <li>All 10 items will be delivered in the size selected during checkout.</li>
+                    <li>Every Mystery Bundle is unique and curated based on our available stock at the time of packing.</li>
+                    <li>Product images displayed on the website are for reference only and may not represent the exact items you receive.</li>
+                    <li>We make every reasonable effort to provide a good variety of clothing and avoid duplicate items within the same bundle whenever possible.</li>
+                    <li>Every item is carefully quality-checked before dispatch to ensure it meets our standards.</li>
+                    <li>Mystery Bundles are sold as surprise collections; therefore, exchanges or returns based on design preference, color, brand, or style will not be accepted.</li>
+                    <li>Returns or replacements will only be considered if an incorrect or damaged product is delivered.</li>
+                    <li>By placing an order, you acknowledge that you understand the random selection process and agree to these Terms & Conditions.</li>
+                  </ul>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
@@ -136,55 +181,6 @@ export default function MysteryBundlesPage() {
                   <p className="text-xs text-muted-foreground mt-3 mb-5 line-clamp-2 font-medium">
                     {bundle.description}
                   </p>
-
-                  {/* T&C Accordion for Mystery Bundles */}
-                  <div className="mb-5 bg-secondary/50 border border-primary/20 rounded-xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] backdrop-blur-md transition-colors hover:bg-secondary/70">
-                    <button
-                      onClick={() => toggleTerms(bundle.id)}
-                      className="w-full flex items-center justify-between p-3.5 text-left transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Info className="w-4 h-4 text-primary" />
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-foreground">
-                          Terms & Conditions
-                        </span>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: expandedTerms[bundle.id] ? 180 : 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                      </motion.div>
-                    </button>
-                    
-                    <AnimatePresence>
-                      {expandedTerms[bundle.id] && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                          className="overflow-hidden"
-                        >
-                          <div className="p-4 pt-1 border-t border-primary/10 bg-secondary/30 text-[11px] text-muted-foreground leading-relaxed space-y-2">
-                            <p className="font-bold text-foreground">Mystery Bundle Policy</p>
-                            <ul className="space-y-2 list-disc pl-3">
-                              <li>The {bundle.items_count || 10} clothing items included in this bundle are selected completely at random from our available inventory.</li>
-                              <li>Customers cannot request or choose specific brands, colors, prints, graphics, or designs.</li>
-                              <li>All {bundle.items_count || 10} items will be delivered in the size selected during checkout.</li>
-                              <li>Every Mystery Bundle is unique and curated based on our available stock at the time of packing.</li>
-                              <li>Product images displayed on the website are for reference only and may not represent the exact items you receive.</li>
-                              <li>We make every reasonable effort to provide a good variety of clothing and avoid duplicate items within the same bundle whenever possible.</li>
-                              <li>Every item is carefully quality-checked before dispatch to ensure it meets our standards.</li>
-                              <li>Mystery Bundles are sold as surprise collections; therefore, exchanges or returns based on design preference, color, brand, or style will not be accepted.</li>
-                              <li>Returns or replacements will only be considered if an incorrect or damaged product is delivered.</li>
-                              <li>By placing an order, you acknowledge that you understand the random selection process and agree to these Terms & Conditions.</li>
-                            </ul>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
 
                   <div className="mt-auto space-y-3 border-t border-primary/10 pt-4">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-foreground block">
