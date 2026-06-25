@@ -307,7 +307,6 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
                     </div>
                     <div>
                       <p className="text-sm font-bold text-white line-clamp-1">{p.name}</p>
-                      <p className="text-xs text-zinc-500">₹{p.price || p.discount_price || p.original_price}</p>
                     </div>
                   </div>
                   <button onClick={() => handleAddProduct(p.id)} className="p-2 bg-[var(--accent-1)]/10 text-[var(--accent-1)] rounded-lg hover:bg-[var(--accent-1)] hover:text-black transition-colors">
@@ -333,7 +332,6 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
                       </div>
                       <div>
                         <p className="text-sm font-bold text-white line-clamp-1">{p.name}</p>
-                        <p className="text-xs text-[var(--accent-1)]">₹{p.price || p.discount_price || p.original_price}</p>
                       </div>
                     </div>
                     <button onClick={() => handleRemoveProduct(p.id)} className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-colors">

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
-import { ShoppingBag, ArrowLeft, Info, ChevronDown } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Info, ChevronDown, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 
@@ -74,9 +74,18 @@ export default function MysteryBundlesPage() {
           </div>
           
           <div className="flex items-center gap-4 pl-5 sm:pl-0">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hidden sm:inline-block">
               {bundles.length} Bundles Available
             </span>
+            <a 
+              href="https://wa.me/917695923756?text=Hi, I would like to inquire about the Mystery Bundles."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-xl text-[11px] font-bold uppercase tracking-widest hover:brightness-110 transition-all shadow-sm"
+            >
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp Enquiry
+            </a>
           </div>
         </div>
 
