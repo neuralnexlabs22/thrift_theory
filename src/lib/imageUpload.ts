@@ -1,3 +1,5 @@
+import imageCompression from 'browser-image-compression';
+
 export type AdminUploadBucket =
   | "product-images"
   | "category-images"
@@ -15,17 +17,38 @@ export async function uploadAdminImage(
   const fileName = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
   const path = `${folder}/${fileName}`;
 
+  // Compress image to prevent Vercel 4.5MB limits and upload timeouts
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1200,
+    useWebWorker: true,
+  };
+  
+  let compressedFile = file;
+  try {
+    compressedFile = await imageCompression(file, options);
+  } catch (error) {
+    console.warn("Image compression failed, using original file:", error);
+  }
+
   const formData = new FormData();
   formData.append("bucket", bucket);
   formData.append("path", path);
-  formData.append("file", file);
+  formData.append("file", compressedFile);
+
 
   const response = await fetch("/api/upload-image", {
     method: "POST",
     body: formData,
   });
 
-  const body = await response.json();
+  let body;
+  try {
+    body = await response.json();
+  } catch (err) {
+    throw new Error("Server returned invalid response. Try uploading a smaller image.");
+  }
+
   if (!response.ok) {
     throw new Error(body?.error || "Upload failed");
   }
