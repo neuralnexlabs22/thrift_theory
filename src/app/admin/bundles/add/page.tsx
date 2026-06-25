@@ -31,7 +31,6 @@ export default function AddBundlePage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
     itemsCount: "1",
     isActive: true,
     colors: [] as string[],
@@ -152,8 +151,8 @@ export default function AddBundlePage() {
     e.preventDefault();
     setMessage({ text: "", type: "" as "success" | "error" });
     
-    if (!formData.name.trim() || !formData.price || !formData.itemsCount) {
-      setMessage({ text: "Name, price, and items count are required.", type: "error" });
+    if (!formData.name.trim() || !formData.itemsCount) {
+      setMessage({ text: "Name and items count are required.", type: "error" });
       return;
     }
 
@@ -162,13 +161,12 @@ export default function AddBundlePage() {
     
     try {
       const validImages = imageUrls.filter((url) => url.trim() !== "");
-      const mainImage = validImages.length > 0 ? validImages[0] : "/images/mystery_bundle_box.png";
-      const price = normalizePriceValue(formData.price);
+      const mainImage = validImages.length > 0 ? validImages[0] : "/images/mystery-bundle.png";
 
       const { error: insertError } = await supabase.from("bundles").insert({
         name: formData.name,
         description: formData.description,
-        price,
+        price: 0,
         items_count: parseInt(formData.itemsCount),
         image_url: mainImage,
         images: validImages,
@@ -266,27 +264,9 @@ export default function AddBundlePage() {
 
         {/* Pricing & Capacity */}
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-white">Pricing & Capacity</h3>
+          <h3 className="text-lg font-bold text-white">Capacity</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
-                Price (₹) *
-              </label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price}
-                onChange={handleInputChange}
-                onWheel={(e) => e.currentTarget.blur()}
-                required
-                min="0"
-                step="0.01"
-                placeholder="999"
-                className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors"
-              />
-            </div>
-            
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">
                 Items Count *

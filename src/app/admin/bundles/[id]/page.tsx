@@ -37,7 +37,6 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
     itemsCount: "1",
     isActive: true,
     colors: [] as string[],
@@ -67,7 +66,6 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
       setFormData({
         name: bData.name || "",
         description: bData.description || "",
-        price: bData.price?.toString() || "",
         itemsCount: bData.items_count?.toString() || "1",
         isActive: bData.is_active,
         colors: bData.colors || [],
@@ -225,7 +223,7 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
     const { error: updateError } = await supabase.from("bundles").update({
       name: formData.name,
       description: formData.description,
-      price: parseFloat(formData.price),
+      price: 0,
       items_count: parseInt(formData.itemsCount),
       image_url: mainImage,
       images: validImages,
@@ -366,14 +364,9 @@ export default function BundleManagementPage({ params }: { params: Promise<{ id:
               </div>
             </div>
 
-            {/* Pricing & Capacity */}
             <div className="bg-[#070707] border border-white/5 rounded-2xl p-6 space-y-6">
-              <h2 className="text-xl font-black uppercase tracking-wider text-white">Pricing & Capacity</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Price (₹) *</label>
-                  <input type="number" name="price" value={formData.price} onChange={handleInputChange} required min="0" step="0.01" className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
-                </div>
+              <h2 className="text-xl font-black uppercase tracking-wider text-white">Capacity</h2>
+              <div className="grid grid-cols-1 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-wider text-zinc-500 font-medium">Items Count *</label>
                   <input type="number" name="itemsCount" value={formData.itemsCount} onChange={handleInputChange} required min="1" className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:border-[var(--accent-1)] focus:outline-none transition-colors" />
